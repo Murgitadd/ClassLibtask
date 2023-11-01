@@ -1,94 +1,60 @@
-CREATE DATABASE MusicApp
+CREATE DATABASE [Library]
 
-USE MusicApp
---------------Tables----------------
-CREATE TABLE Users (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    Name NVARCHAR(50),
-    Surname NVARCHAR(50),
-    Username NVARCHAR(50),
-    Password NVARCHAR(20) NULL,
-    Gender NVARCHAR(10) NULL
-);
+USE [Library]
 
-CREATE TABLE Artists (
+CREATE TABLE Authors (
     id INT PRIMARY KEY IDENTITY(1,1),
-    Name NVARCHAR(50),
-    Surname NVARCHAR(50),
-    Birthday DATETIME NULL,
-    Gender NVARCHAR(10) NULL
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50) DEFAULT 'XXX'
 );
 
 
-CREATE TABLE Categories (
+CREATE TABLE Borrowers (
     id INT PRIMARY KEY IDENTITY(1,1),
-    Name NVARCHAR(50)
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50) DEFAULT 'XXX',
+    Email NVARCHAR(50) UNIQUE
 );
 
 
-CREATE TABLE Musics (
+CREATE TABLE Books (
     id INT PRIMARY KEY IDENTITY(1,1),
-    Name NVARCHAR(50),
-    Duration DECIMAL,
-    ArtistId INT FOREIGN KEY REFERENCES Artists(id),
-    CategoryId INT FOREIGN KEY REFERENCES Categories(id)
+    Title NVARCHAR(50),
+    ISBN DECIMAL(13, 0) UNIQUE DEFAULT 0000000000000,
+    PublicationDate INT CHECK (PublicationDate = 2023),
+    AuthorId INT,
+    FOREIGN KEY (AuthorId) REFERENCES Authors(id)
 );
 
-CREATE TABLE Playlists (
+
+CREATE TABLE Checkouts (
     id INT PRIMARY KEY IDENTITY(1,1),
-    UserId INT FOREIGN KEY REFERENCES Users(id),
-    MusicId INT FOREIGN KEY REFERENCES Musics(id)
+    CheckoutDate DATETIME,
+    ReturnDate DATETIME,
+    BookId INT,
+    BorrowerId INT,
+    FOREIGN KEY (BookId) REFERENCES Books(id),
+    FOREIGN KEY (BorrowerId) REFERENCES Borrowers(id)
 );
---------------Tables----------------
 
---------------Inserts----------------
-
-INSERT INTO Users (Name, Surname, Username, Password, Gender)
+INSERT INTO Authors (FirstName, LastName)
 VALUES
-    ('Murad', 'Khasaddinov', 'MurEdu2003', 'forgot23', 'Male'),
-    ('Subhan', 'Amiraslanov', 'Adolf', 'hail123', 'Female'),
-    ('Vagif', 'Qarayev', 'notNasirli', 'qaraqarayev', 'Male');
+    ('Sabir', 'Nezeriyev'),
+    ('Adil', 'Praktikov'),
+    ('Qurban', 'Ramazanli');
 
-INSERT INTO Artists (Name, Surname, Birthday, Gender)
+INSERT INTO Borrowers (FirstName, LastName, Email)
 VALUES
-    ('Rashid', 'Behbudov', '1958-08-29', 'Male'),
-    ('Katy', 'Perry', '2000-05-05', 'Female'),
-    ('Engelbert', 'Humperdinck', '1947-03-25', 'Male');
+    ('Murad', 'Khasaddinov', 'murad@gmail.com'),
+    ('Subhan', 'Amiraslanov', 'adolf@mail.ru'),
+    ('Vagif', 'Qarayev', 'notnasirli@code.edu.az');
 
-INSERT INTO Categories (Name)
+INSERT INTO Books (Title, ISBN, PublicationDate, AuthorId)
 VALUES
-    ('Pop'),
-    ('Rock'),
-    ('Classical');
+    ('C#-in esaslari', '1234567890098', 2023,1),
+	('SQL ve database', '8746823194721', 2022,2),
+	('Front End  developing', '1234567938398', 2000,3);
 
-
-
-INSERT INTO Musics (Name, Duration, ArtistId, CategoryId)
+INSERT INTO Checkouts(CheckoutDate, ReturnDate, BookId, BorrowerId)
 VALUES
-    ('Nazende Sevgilim', 5.42, 1, 3),
-    ('Roar', 4.55, 2, 1),
-    ('A mMan Without Love', 4.42, 3, 2);
-
-
-
-INSERT INTO Playlists (UserId, MusicId)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3);
-
---------------Inserts----------------
-
-CREATE VIEW MusicInfo AS
-SELECT
-    M.Name AS MusicName,
-    M.Duration AS MusicLength,
-    C.Name AS MusicCategory,
-    CONCAT(A.Name, ' ', A.Surname) AS ArtistName
-FROM Musics M
-INNER JOIN Categories C ON M.CategoryId = C.id
-INNER JOIN Artists A ON M.ArtistId = A.id;
-
-SELECT * FROM MusicInfo;
-
-DROP TABLE Categories;
+    (),
